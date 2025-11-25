@@ -1,7 +1,7 @@
-import InterviewPage from "@/client/pages/Interview"
+import Interview from "@/client/pages/interview"
 
 export default function page() {
   return <div>
-     <InterviewPage />
+     <Interview />
   </div>
 }
