@@ -2,6 +2,8 @@
 
 import axios from "axios";
 import { useState } from "react";
+import usePost from "../hooks/usepost";
+import { useRouter } from "next/navigation";
 
 
 export default function Upload() {
@@ -9,6 +11,8 @@ export default function Upload() {
 const [currentQuestion,setCurrentQuestion] = useState('')
 const [currentAnswer,setCurrentAnswer] = useState('')
 const [resume,setResume] = useState()
+const { loading, error, response, postData } = usePost();
+const router = useRouter()
 
 //speak function
 const speak = (text) => {
@@ -63,50 +67,52 @@ const listen = () => {
 
   //start interview
 
-  const startInterview = async() => {
-    while(true){
+  // const startInterview = async() => {
+  //   while(true){
 
-       const nextQuestion = await askQuestion(currentQuestion,currentAnswer)
+  //      const nextQuestion = await askQuestion(currentQuestion,currentAnswer)
 
-       console.log(nextQuestion,'questionnnnnnnnnnn')
+  //      console.log(nextQuestion,'questionnnnnnnnnnn')
 
-       await speak(nextQuestion)
+  //      await speak(nextQuestion)
 
-       const userAnswer = await listen()
+  //      const userAnswer = await listen()
 
-       console.log(userAnswer,'uiserrrrrrr')
+  //      console.log(userAnswer,'uiserrrrrrr')
 
-       setCurrentAnswer(userAnswer)
-       setCurrentQuestion(nextQuestion)
+  //      setCurrentAnswer(userAnswer)
+  //      setCurrentQuestion(nextQuestion)
 
-       if (!nextQuestion || nextQuestion === "END") {
-        await speak("Thank you, the interview is completed.");
-        break;
-       }
-    }
+  //      if (!nextQuestion || nextQuestion === "END") {
+  //       await speak("Thank you, the interview is completed.");
+  //       break;
+  //      }
+  //   }
+  // }
+
+
+  //start interview 
+
+  const startInterview = () => {
+    router.push('/interview')
   }
 
+  
   //upload file
 
   const uploadResume = async (e) => {
     const file = e.target.files?.[0];
 
-  if (!file) {
-    console.log("No file selected");
-    return;
-  }
+    if (!file) {
+      console.log("No file selected");
+      return;
+    }
 
-  setResume(file)
-  const formData = new FormData();
-  formData.append("resume", file, file.name);
+    setResume(file)
 
-    const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-    });
+    await postData("/api/upload", { resume: file }, true);
 
-    const data = await res.json();
-    console.log("Generated Questions:", data.questions);
+    console.log("Generated Questions:", response);
 };
 
 
