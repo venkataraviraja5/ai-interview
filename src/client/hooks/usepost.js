@@ -23,11 +23,11 @@ export default function usePost() {
         config.headers = { "Content-Type": "multipart/form-data"}
       }
 
-      const res = await axios.post(endPoint, payload, config)
-      console.log(res.data,'apiiiiiiiiiiiiiiiii')
-      setResponse(res.data);
+      const response = await axios.post(endPoint, payload, config)
+      // console.log(response.data,'apiiiiiiiiiiiiiiiii')
+      setResponse(response.data);
 
-      return res.data
+      return response.data
 
     } catch (err) {
       console.error(err);
