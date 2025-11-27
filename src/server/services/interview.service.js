@@ -1,4 +1,5 @@
 import { aiService } from "./ai.service"
+import { redis } from "@/lib/redis"
 
 
 const resume = `
@@ -54,9 +55,11 @@ English, Hindi, Telugu
 
 export const generateQuestionsService =async (body) => {
  
-    const {prevQuestion,answer} = body
+    const {prevQuestion,answer,redisId} = body
 
-    const result = await aiService(resume)
+    const resume = await redis.get(redisId)
+
+    const result = await aiService(resume,prevQuestion,answer)
 
     console.log(prevQuestion,answer,result.response.text(),'.................')
 

@@ -1,19 +1,31 @@
-import pdf from "pdf-parse";
+import { redis } from "@/lib/redis";
+import { extractText } from "unpdf";
 
-export const uploadService = async(req) => {
-  
-    const formData = await req.formData();
-    const file = formData.get("resume");
+export const uploadService = async (req) => {
+  const form = await req.formData();
+  const file = form.get("resume");
 
+  if (!file) {
+    return NextResponse.json({
+      success: false,
+      message: "No file uploaded",
+    });
+  }
 
-    console.log(file,'.fileeeeeeeeeeeee')
+  const arrayBuffer = await file.arrayBuffer();
 
-    const buffer = Buffer.from(await file.arrayBuffer());
+  const uint8 = new Uint8Array(arrayBuffer);
 
   // Extract text
-  const pdfData = await pdf(buffer);
+  const result = await extractText(uint8);
 
-  console.log(pdfData.text, "PDF TEXT");
+  let text = result.text || "";
 
-    return 'hllo'
-}
+  const redisKey = `resume:${Date.now()}`
+
+  await redis.set(redisKey,text,{ ex: 3600 })
+
+  // console.log(text, "texttttttttttttt");
+
+  return redisKey
+};

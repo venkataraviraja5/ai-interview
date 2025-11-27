@@ -1,27 +1,29 @@
-"use client"
+"use client";
 
-import { useEffect,useState } from "react";
+import { useState } from "react";
 import usePost from "../hooks/usepost";
-import { FaMicrophone } from "react-icons/fa";
 import { MicroPhone } from "../components/MicroPhone";
-
+import { useParams } from "next/navigation";
 
 export default function Interview() {
   const [currentQuestion, setCurrentQuestion] = useState("");
   const [currentAnswer, setCurrentAnswer] = useState("");
   const { loading, error, response, postData } = usePost();
-  const [isUserSpeaking,setUserSpeaking] = useState(false)
-  const [isInterviewerSpeaking,setIsInterviewerSpeaking] = useState(false)
+  const [isUserSpeaking, setUserSpeaking] = useState(false);
+  const [isInterviewerSpeaking, setIsInterviewerSpeaking] = useState(false);
+
+  const params = useParams()
+  const id = params.id
 
   //speak function
   const speak = (text) => {
     return new Promise((resolve) => {
       const utter = new SpeechSynthesisUtterance(text);
 
-      setIsInterviewerSpeaking(true)
+      setIsInterviewerSpeaking(true);
       utter.onend = () => {
-        resolve()
-        setIsInterviewerSpeaking(false)
+        resolve();
+        setIsInterviewerSpeaking(false);
       }; // Continue only after speaking ends
 
       speechSynthesis.speak(utter);
@@ -41,13 +43,13 @@ export default function Interview() {
 
       recognition.onresult = (e) => {
         const text = e.results[0][0].transcript;
-        console.log("User said:", text);
+        // console.log("User said:", text);
         resolve(text);
       };
 
       recognition.onerror = (err) => {
-        console.error(err);
-        resolve(""); 
+        // console.error(err);
+        resolve("");
       };
 
       setUserSpeaking(true);
@@ -56,34 +58,35 @@ export default function Interview() {
       // Resolve with empty string if no speech detected
       setTimeout(() => {
         recognition.stop();
-        setUserSpeaking(false)
-        resolve(""); 
+        setUserSpeaking(false);
+        resolve("");
       }, 10000);
     });
   };
 
   //ask question function
   const askQuestion = async (prevQuestion, answer) => {
-   
+    const apiResponse = await postData("/api/interview", {
+      redisId:id,
+      prevQuestion,
+      answer,
+    });
 
-    const apiResponse = await postData('/api/interview',{
-        prevQuestion,
-        answer
-    })
-
-    // console.log("API Response:", apiResponse);
 
     if (apiResponse) {
-    return apiResponse.question;
-  }
-    return
-  };
+      return apiResponse.question;
+    }
 
+  };
 
   //start interview function
   const startInterview = async () => {
+    
+    let question = currentQuestion;
+    let answer = currentAnswer;
+
     while (true) {
-      const nextQuestion = await askQuestion(currentQuestion, currentAnswer);
+      const nextQuestion = await askQuestion(question,answer);
 
       // console.log(nextQuestion, "question");
 
@@ -92,6 +95,9 @@ export default function Interview() {
       const userAnswer = await listen();
 
       // console.log(userAnswer, "user");
+
+      question = nextQuestion
+      answer = userAnswer
 
       setCurrentAnswer(userAnswer);
       setCurrentQuestion(nextQuestion);
@@ -103,18 +109,17 @@ export default function Interview() {
     }
   };
 
-
   return (
     <div>
-    <div className="w-full h-screen flex">
-      <div className="w-1/2 bg-red-200 h-full flex justify-center items-center">
-         <MicroPhone isSpeaking={isInterviewerSpeaking}  />
-      </div>
+      <div className="w-full h-screen flex">
+        <div className="w-1/2 bg-red-200 h-full flex justify-center items-center">
+          <MicroPhone isSpeaking={isInterviewerSpeaking} />
+        </div>
 
-      <div className="w-1/2 bg-blue-200 h-full flex justify-center items-center">
-         <MicroPhone isSpeaking={isUserSpeaking}  />
+        <div className="w-1/2 bg-blue-200 h-full flex justify-center items-center">
+          <MicroPhone isSpeaking={isUserSpeaking} />
+        </div>
       </div>
-    </div>
       <button onClick={startInterview}>start interveiw</button>
     </div>
   );
