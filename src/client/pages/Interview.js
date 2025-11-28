@@ -11,9 +11,10 @@ export default function Interview() {
   const { loading, error, response, postData } = usePost();
   const [isUserSpeaking, setUserSpeaking] = useState(false);
   const [isInterviewerSpeaking, setIsInterviewerSpeaking] = useState(false);
+  const [interviewButton,setInterviewButton] = useState(true)
 
-  const params = useParams()
-  const id = params.id
+  const params = useParams();
+  const id = params.id;
 
   //speak function
   const speak = (text) => {
@@ -67,26 +68,25 @@ export default function Interview() {
   //ask question function
   const askQuestion = async (prevQuestion, answer) => {
     const apiResponse = await postData("/api/interview", {
-      redisId:id,
+      redisId: id,
       prevQuestion,
       answer,
     });
 
-
     if (apiResponse) {
       return apiResponse.question;
     }
-
   };
 
   //start interview function
   const startInterview = async () => {
-    
     let question = currentQuestion;
     let answer = currentAnswer;
 
+    setInterviewButton(false)
+    
     while (true) {
-      const nextQuestion = await askQuestion(question,answer);
+      const nextQuestion = await askQuestion(question, answer);
 
       // console.log(nextQuestion, "question");
 
@@ -96,8 +96,8 @@ export default function Interview() {
 
       // console.log(userAnswer, "user");
 
-      question = nextQuestion
-      answer = userAnswer
+      question = nextQuestion;
+      answer = userAnswer;
 
       setCurrentAnswer(userAnswer);
       setCurrentQuestion(nextQuestion);
@@ -111,16 +111,37 @@ export default function Interview() {
 
   return (
     <div>
-      <div className="w-full h-screen flex">
-        <div className="w-1/2 bg-red-200 h-full flex justify-center items-center">
+      <div className="w-full h-[70vh] flex flex-col lg:flex-row gap-3 p-5">
+        <div className="lg:w-1/2 w-full h-full flex justify-center items-center rounded-[20px] bg-gradient-to-br from-fuchsia-500 to-purple-600 text-white">
           <MicroPhone isSpeaking={isInterviewerSpeaking} />
         </div>
 
-        <div className="w-1/2 bg-blue-200 h-full flex justify-center items-center">
+        <div className="lg:w-1/2 w-full h-full flex justify-center items-center rounded-[20px] bg-gradient-to-br from-cyan-400 to-blue-600 text-white">
           <MicroPhone isSpeaking={isUserSpeaking} />
         </div>
       </div>
-      <button onClick={startInterview}>start interveiw</button>
+
+      <div className="flex gap-4 mt-6 justify-center items-center">
+        {/* Start Interview Button */}
+        {
+          interviewButton ?
+
+          <button
+            onClick={startInterview}
+            className="px-6 py-3 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 active:scale-95 transition cursor-pointer"
+          >
+            Start Interview
+          </button>
+          :
+          <button
+            // onClick={getResults}
+            className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 active:scale-95 transition cursor-pointer"
+          >
+            Get Results
+          </button>
+        }
+
+      </div>
     </div>
   );
 }

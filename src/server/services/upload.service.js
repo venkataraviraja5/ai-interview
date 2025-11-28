@@ -1,5 +1,6 @@
 import { redis } from "@/lib/redis";
 import { extractText } from "unpdf";
+import { nanoid } from 'nanoid';
 
 export const uploadService = async (req) => {
   const form = await req.formData();
@@ -21,7 +22,7 @@ export const uploadService = async (req) => {
 
   let text = result.text || "";
 
-  const redisKey = `resume:${Date.now()}`
+  const redisKey = `resume:${nanoid()}`
 
   await redis.set(redisKey,text,{ ex: 3600 })
 

@@ -1,13 +1,14 @@
 
 "use client";
 
-import { FaMicrophone } from "react-icons/fa";
+// import { FaMicrophone } from "react-icons/fa";
+import { IoMicOutline } from "react-icons/io5";
 
 export const MicroPhone = ({ isSpeaking, color="border-red-500" }) => {
    return (
     <div className="relative w-32 h-32 flex items-center justify-center">
       {/* Mic Icon */}
-      <FaMicrophone className="text-gray-700 z-10" size={40} />
+      <IoMicOutline className="text-gray-700 z-10" size={40} />
 
       {/* Wave circles */}
       <div
