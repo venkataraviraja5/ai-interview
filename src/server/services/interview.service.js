@@ -1,67 +1,53 @@
-import { aiService } from "./ai.service"
-import { redis } from "@/lib/redis"
+import { aiService } from "./ai.service";
+import { redis } from "@/lib/redis";
+import { INTERVIEW_PROMPT } from "@/constant/constant";
+
+export const generateQuestionsService = async (body) => {
+  const { prevQuestion, answer, redisId } = body;
+
+   
+
+  const decodedId = decodeURIComponent(redisId);
+
+  const resume = await redis.get(decodedId);
+
+  const finalPrompt = `
+      ${INTERVIEW_PROMPT}
+  
+      RESUME:
+      ${resume}
+  
+      Previous Question:
+      ${prevQuestion || "None (start of interview)"}
+  
+      Candidate's Answer:
+      ${answer || "No answer yet"}
+  
+      Based on the previous question and the answer given,
+      ask ONLY the next interview question. 
+      Do NOT explain. 
+      Do NOT answer the question yourself. 
+      If the interview should end, answer with "END".
+  
+      Now ask ONLY the next interview question.
+      Do NOT explain. Do NOT answer the question.
+  `;
 
 
-const resume = `
-Ravi Kumar
-Email: ravikumar@example.com
-Phone: +91 98765 43210
-Location: Hyderabad, India
+  const result = await aiService(finalPrompt);
+  const nextQuestion = result.response.text();
 
-Professional Summary:
-Full-stack developer with 3+ years of experience building scalable web applications. 
-Strong expertise in JavaScript, React, Node.js, Express, MongoDB, and REST APIs. 
-Experienced in cloud deployment, CI/CD, and microservices.
+  if (prevQuestion) {
+    const qa = JSON.stringify({
+      interviewQuestion: prevQuestion,
+      userAnswer:answer,
+      timestamp: Date.now(),
+    });
 
-Skills:
-- Frontend: HTML, CSS, Tailwind, React.js, Next.js, Redux Toolkit
-- Backend: Node.js, Express.js, JWT Authentication
-- Database: MongoDB, PostgreSQL
-- Cloud/DevOps: Docker, GitHub Actions, AWS EC2, S3
-- Tools: Git, Postman, Jira
+    const pushed = await redis.lpush(`result:${decodedId}`, qa);
 
-Experience:
-Software Developer – TechNova Solutions (2021–Present)
-- Developed and deployed full-stack applications using MERN stack.
-- Improved API response time by 35% by optimizing database indexes.
-- Integrated Razorpay and Stripe payment gateways.
-- Implemented authentication system with roles and permissions.
-- Built dashboards using Recharts and Chart.js.
-
-Junior Web Developer – CodeWorks Labs (2020–2021)
-- Converted Figma designs into responsive UI with Tailwind CSS.
-- Built reusable React components and improved Lighthouse score by 20%.
-- Assisted in backend API development using Express and MongoDB.
-
-Projects:
-1. AI Interview App
-   - Built an AI-powered interview generator using Next.js + OpenAI APIs.
-   - Supports PDF resume parsing, dynamic questions, and scoring.
-
-2. Ecommerce Platform
-   - MERN stack app with admin panel, product filtering, and payments.
-
-Education:
-B.Tech in Computer Science – JNTU Hyderabad (2016–2020)
-
-Certifications:
-- AWS Cloud Practitioner
-- JavaScript Algorithms – FreeCodeCamp
-
-Languages:
-English, Hindi, Telugu
-`
+  }
 
 
-export const generateQuestionsService =async (body) => {
- 
-    const {prevQuestion,answer,redisId} = body
-
-    const resume = await redis.get(redisId)
-
-    const result = await aiService(resume,prevQuestion,answer)
-
-    console.log(prevQuestion,answer,result.response.text(),'.................')
-
-    return result.response.text()
-}
+  return nextQuestion;
+};

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState,useRef } from "react";
 import usePost from "../hooks/usepost";
 import { MicroPhone } from "../components/MicroPhone";
 import { useParams } from "next/navigation";
@@ -12,6 +12,7 @@ export default function Interview() {
   const [isUserSpeaking, setUserSpeaking] = useState(false);
   const [isInterviewerSpeaking, setIsInterviewerSpeaking] = useState(false);
   const [interviewButton,setInterviewButton] = useState(true)
+ const isInterviewRunning = useRef(false);
 
   const params = useParams();
   const id = params.id;
@@ -78,14 +79,20 @@ export default function Interview() {
     }
   };
 
+
+ 
   //start interview function
   const startInterview = async () => {
+
+    isInterviewRunning.current = true;
+
     let question = currentQuestion;
     let answer = currentAnswer;
 
     setInterviewButton(false)
+
     
-    while (true) {
+    while (isInterviewRunning.current) {
       const nextQuestion = await askQuestion(question, answer);
 
       // console.log(nextQuestion, "question");
@@ -106,6 +113,25 @@ export default function Interview() {
         await speak("Thank you, the interview is completed.");
         break;
       }
+    }
+  };
+
+
+  //interview result function
+
+  //ask question function
+  const getInterviewResult = async () => {
+
+    isInterviewRunning.current = false;
+    setIsInterviewerSpeaking(false)
+    setUserSpeaking(false)
+
+    const apiResponse = await postData("/api/result", {
+      redisId: id,
+    });
+
+    if (apiResponse) {
+      return apiResponse.question;
     }
   };
 
@@ -134,13 +160,14 @@ export default function Interview() {
           </button>
           :
           <button
-            // onClick={getResults}
+            onClick={getInterviewResult}
             className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 active:scale-95 transition cursor-pointer"
           >
             Get Results
           </button>
         }
 
+        
       </div>
     </div>
   );

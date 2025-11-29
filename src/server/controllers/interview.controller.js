@@ -57,7 +57,7 @@ export const generateQuestionsController = async (body) => {
 
   const question = await generateQuestionsService(body);
 
-  console.log(question,'quessssssssssss')
+  // console.log(question,'quessssssssssss')
 
   return question;
 };
