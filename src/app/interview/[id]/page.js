@@ -1,4 +1,4 @@
-import Interview from "@/client/pages/interview"
+import Interview from "@/client/components/interview"
 
 export default function page() {
   return <div>

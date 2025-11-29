@@ -2,9 +2,9 @@
 
 import { useState, useRef } from "react";
 import usePost from "../hooks/usepost";
-import { MicroPhone } from "../components/MicroPhone";
+import { MicroPhone } from "./MicroPhone";
 import { useParams } from "next/navigation";
-import Modal from "../components/Modal";
+import Modal from "./Modal";
 import { useRouter } from "next/navigation";
 
 export default function Interview() {
