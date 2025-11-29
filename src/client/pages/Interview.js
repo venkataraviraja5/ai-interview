@@ -136,14 +136,20 @@ export default function Interview() {
   };
 
   return (
-    <div>
+    <div className="bg-gray-900 min-h-screen">
       <div className="w-full h-[70vh] flex flex-col lg:flex-row gap-3 p-5">
         <div className="lg:w-1/2 w-full h-full flex justify-center items-center rounded-[20px] bg-gradient-to-br from-fuchsia-500 to-purple-600 text-white">
-          <MicroPhone isSpeaking={isInterviewerSpeaking} />
+          <div className="flex flex-col justify-center items-center font-bold">
+            <MicroPhone isSpeaking={isInterviewerSpeaking} />
+            <span>AI </span>
+          </div>
         </div>
 
         <div className="lg:w-1/2 w-full h-full flex justify-center items-center rounded-[20px] bg-gradient-to-br from-cyan-400 to-blue-600 text-white">
-          <MicroPhone isSpeaking={isUserSpeaking} />
+         <div className="flex flex-col justify-center items-center font-bold">
+           <MicroPhone isSpeaking={isUserSpeaking} />
+            <span>You</span>
+         </div>
         </div>
       </div>
 
@@ -166,8 +172,6 @@ export default function Interview() {
             Get Results
           </button>
         }
-
-        
       </div>
     </div>
   );

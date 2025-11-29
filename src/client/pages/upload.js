@@ -26,11 +26,11 @@ export default function Upload() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-start p-10 gap-12">
+    <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-start p-10 gap-12 ">
       {/* ---- RESUME UPLOAD SECTION ---- */}
       <section className="bg-white rounded-2xl md:shadow-lg p-10 w-full max-w-xl">
-        <h2 className="md:text-2xl text-small font-semibold text-gray-800 mb-4 flex md:gap-5 gap-2">
-         <FaRegFilePdf /> <span className="mt-[-2px]">Upload Your Resume</span>
+        <h2 className="md:text-2xl text-small font-semibold text-gray-800 mb-4 flex gap-2">
+         <FaRegFilePdf /> <span className="mt-[-5px]">Upload Your Resume</span>
         </h2>
 
         <label className="flex items-center gap-4 border-2 border-dashed border-gray-400 rounded-xl p-6 cursor-pointer hover:border-black transition">
