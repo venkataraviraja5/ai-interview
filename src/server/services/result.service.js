@@ -11,8 +11,6 @@ const resultService = async(req) => {
 
    const questionAndAnswersList = await redis.lrange(`result:${decodedId}`,0,-1)
 
-   console.log(questionAndAnswersList,'questoponsssssssssssssssss')
-
    const formattedQA = questionAndAnswersList.map(item => {
       return `
       **Question:** ${item.interviewQuestion.trim()}
