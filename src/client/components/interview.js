@@ -160,7 +160,7 @@ export default function Interview() {
         <div className="lg:w-1/2 w-full h-full flex justify-center items-center rounded-[20px] bg-gradient-to-br from-fuchsia-500 to-purple-600 text-white">
           <div className="flex flex-col justify-center items-center font-bold">
             <MicroPhone isSpeaking={isInterviewerSpeaking} />
-            <span>AI </span>
+            <span>{loading ? 'Generating question...' : "AI"}</span>
           </div>
         </div>
 
