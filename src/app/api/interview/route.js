@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { generateQuestionsController } from "../../../server/controllers/interview.controller";
+import { catchAsync } from "@/utils/catchAsync";
 
-export async function POST(req) {
+
+
+export const POST = catchAsync(async(req) => {
   const body = await req.json();
   const response = await generateQuestionsController(body);
 
@@ -9,4 +12,4 @@ export async function POST(req) {
     success: true,
     question: response,
   });
-}
+})
